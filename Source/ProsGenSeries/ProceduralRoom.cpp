@@ -1,6 +1,6 @@
 
 #include "ProceduralRoom.h"
-#include "Kismet/KismetMathLibrary.h"
+#include "DrawDebugHelpers.h"
 
 
 AProceduralRoom::AProceduralRoom()
@@ -11,16 +11,25 @@ AProceduralRoom::AProceduralRoom()
 	Floor = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FloorComponent"));
 
 	SetRootComponent(Floor);
+
+	GridSizeX = 5;
+	GridSizeY = 5;
+	SquareWidth = 200.f;
+	GridHeight = 1.0f;
+	RoomLength = 1000.0f;
+	RoomWidth = 1000.0f;
+	Radius = 25.f;
+
+	TopLeft = FVector(0.f);
+	BottomRight = FVector(1000.f, 1000.f, 0.f);
 }
 
 void AProceduralRoom::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SpawnItem(ChairClass);
-	SpawnItem(ChairClass);
-	SpawnItem(ChairClass);
-	SpawnItem(ChairClass);
+	CreateGrid();
+	PlacePointsOnGrid();
 }
 
 void AProceduralRoom::Tick(float DeltaTime)
@@ -40,5 +49,49 @@ void AProceduralRoom::SpawnItem(UClass* ItemToSpawn)
 	FRotator Rotation(0.f, Yaw, 0.f);
 
 	GetWorld()->SpawnActor<AActor>(ItemToSpawn, Location, Rotation);
+}
+
+void AProceduralRoom::CreateGrid()
+{
+	for (int32 i = 0; i < GridSizeX + 1; i++)
+	{
+		FVector Start = TopLeft + FVector(i * SquareWidth, 0.f, GridHeight);
+		FVector End = Start + FVector(0.f, RoomLength, GridHeight);
+		DrawDebugLine(GetWorld(), Start, End, FColor::Blue, true);
+	}
+
+	for (int32 i = 0; i < GridSizeX + 1; i++)
+	{
+		FVector Start = TopLeft + FVector(0.f, i * SquareWidth, GridHeight);
+		FVector End = Start + FVector(RoomLength, 0.f, GridHeight);
+		DrawDebugLine(GetWorld(), Start, End, FColor::Blue, true);
+	}
+}
+
+FVector AProceduralRoom::GetRandomPointInSquare(const FVector& UpperLeft, const FVector& LowerRight)
+{
+	float RandomX = FMath::FRandRange(UpperLeft.X, LowerRight.X);
+	float RandomY = FMath::FRandRange(UpperLeft.Y, LowerRight.Y);
+
+	return FVector(RandomX, RandomY, 0.f);
+}
+
+void AProceduralRoom::PlacePointsOnGrid()
+{
+	for (int32 i = 0; i < GridSizeX; i++)
+	{
+		for (int32 j = 0; j < GridSizeY; j++)
+		{
+			FVector UpperLeft(i * SquareWidth + Radius, j * SquareWidth + Radius, GridHeight);
+			FVector LowerRight(i * SquareWidth + SquareWidth - Radius, j * SquareWidth + SquareWidth - Radius, GridHeight);
+			FVector RandomPointInSquare = GetRandomPointInSquare(UpperLeft, LowerRight);
+			
+			DrawDebugPoint(GetWorld(), RandomPointInSquare, 5.f, FColor::Red, true);
+
+			const float Yaw = FMath::FRandRange(0.f, 360.f);
+			GetWorld()->SpawnActor<AActor>(ChairClass, RandomPointInSquare, FRotator(0.f, Yaw, 0.f));
+			DrawDebugCircle(GetWorld(), RandomPointInSquare, Radius, 40, FColor::Red, true, -1.f, 0, 2.5f, FVector(0.f, 1.f, 0.f), FVector(1.f, 0.f, 0.f), true);
+		}
+	}
 }
 

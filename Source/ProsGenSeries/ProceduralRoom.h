@@ -27,5 +27,23 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> ChairClass;
 
+	float SquareWidth;
+	float GridHeight;
+	float RoomLength;
+	float RoomWidth;
+	
+	FVector TopLeft;
+	FVector BottomRight;
+	
+	int32 GridSizeX;
+	int32 GridSizeY;
+
+	float Radius;
+	
     void SpawnItem(UClass* ItemToSpawn);
+
+	void CreateGrid();
+
+	FVector GetRandomPointInSquare(const FVector& UpperLeft, const FVector& LowerRight);
+	void PlacePointsOnGrid();
 };
