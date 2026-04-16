@@ -1,6 +1,7 @@
 
 #include "ProceduralRoom.h"
 #include "DrawDebugHelpers.h"
+#include "FloorNode.h"
 
 
 AProceduralRoom::AProceduralRoom()
@@ -27,9 +28,18 @@ AProceduralRoom::AProceduralRoom()
 void AProceduralRoom::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Unique ptr only allows one pointer to point to it at once shared ptr is the opposite allows multiple
+	// unique ptr when the pointer goes out of scope (in this case once the begin play ends so the pointer life has ended) it destroyes the object
+	//TUniquePtr<FloorNode> UniqueNodePtr(new FloorNode());
+
+	TSharedPtr<FloorNode> SharedNodePtr(new FloorNode());
+	//FloorNode* Node = new FloorNode();
+
 	
-	CreateGrid();
-	PlacePointsOnGrid();
+	
+	//CreateGrid();
+	//PlacePointsOnGrid();
 }
 
 void AProceduralRoom::Tick(float DeltaTime)
