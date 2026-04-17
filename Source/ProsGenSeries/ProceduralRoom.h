@@ -22,7 +22,7 @@ protected:
 private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room", meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* Floor;
+	UStaticMeshComponent* FloorMesh;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> ChairClass;

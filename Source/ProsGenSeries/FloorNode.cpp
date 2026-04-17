@@ -1,7 +1,10 @@
 #include "FloorNode.h"
 
+int32 FloorNode::FloorNodeCount = 0;
+
 FloorNode::FloorNode()
 {
+	++FloorNodeCount;
 	UE_LOG(LogTemp, Warning, TEXT("FloorNode Created"));
 }
 
@@ -12,10 +15,12 @@ FloorNode::FloorNode(const FCornerCoordinates& Coordinates)
 	CornerCoordinates.LowerRightX = Coordinates.LowerRightX;
 	CornerCoordinates.LowerRightY = Coordinates.LowerRightY;
 
+	++FloorNodeCount;
 	UE_LOG(LogTemp, Warning, TEXT("FloorNode Created"));
 }
 
 FloorNode::~FloorNode()
 {
+	--FloorNodeCount;
 	UE_LOG(LogTemp, Warning, TEXT("FloorNode Destroyed"));
 }

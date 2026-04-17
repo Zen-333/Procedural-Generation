@@ -1,7 +1,7 @@
 
 #include "ProceduralRoom.h"
 #include "DrawDebugHelpers.h"
-#include "FloorNode.h"
+#include "Floor.h"
 
 
 AProceduralRoom::AProceduralRoom()
@@ -9,9 +9,8 @@ AProceduralRoom::AProceduralRoom()
 
 	PrimaryActorTick.bCanEverTick = true;
 
-	Floor = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FloorComponent"));
-
-	SetRootComponent(Floor);
+	FloorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FloorMesh"));
+	SetRootComponent(FloorMesh);
 
 	GridSizeX = 5;
 	GridSizeY = 5;
@@ -29,17 +28,26 @@ void AProceduralRoom::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Unique ptr only allows one pointer to point to it at once shared ptr is the opposite allows multiple
+	TSharedPtr<Floor> TheFloor(new Floor());
+	TheFloor->Partition();
+
+	
+	/* Unique ptr only allows one pointer to point to it at once shared ptr is the opposite allows multiple
 	// unique ptr when the pointer goes out of scope (in this case once the begin play ends so the pointer life has ended) it destroyes the object
 	//TUniquePtr<FloorNode> UniqueNodePtr(new FloorNode());
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Nodes in existence: %d"), FloorNode::GetNodeCount());
+		TSharedPtr<FloorNode> UniqueNodePtr(new FloorNode());
+		UE_LOG(LogTemp, Warning, TEXT("Nodes in existence: %d"), FloorNode::GetNodeCount());
+	}
 
-	TSharedPtr<FloorNode> SharedNodePtr(new FloorNode());
-	//FloorNode* Node = new FloorNode();
-
+	UE_LOG(LogTemp, Warning, TEXT("Nodes in existence: %d"), FloorNode::GetNodeCount());
 	
+	//FloorNode* Node = new FloorNode();
 	
 	//CreateGrid();
-	//PlacePointsOnGrid();
+	//PlacePointsOnGrid();*/
+	
 }
 
 void AProceduralRoom::Tick(float DeltaTime)
