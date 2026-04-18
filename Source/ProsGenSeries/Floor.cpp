@@ -1,13 +1,18 @@
 #include "Floor.h"
 
 #include "FloorNode.h"
+#include "DrawDebugHelpers.h"
+#include "Engine/World.h"
 
 Floor::Floor()
 {
-	FloorGridSizeX = 5;
-	FloorGridSizeY = 5;
+	FloorGridSizeX = 25;
+	FloorGridSizeY = 25;
 	RoomMinX = 1;
 	RoomMinY = 1;
+
+	UnitLength = 200.f;
+	SplitChance = 3.5f;
 }
 
 Floor::~Floor()
@@ -43,14 +48,30 @@ bool Floor::ShouldSplitNode(TSharedPtr<FloorNode> InNode, ESplitOrientation Orie
 	if (Orientation == ESplitOrientation::ESO_Horizontal) 
 	{
 		const int32 FloorLength = CornerCoordinates.LowerRightY - CornerCoordinates.UpperLeftY;
-		if (FloorLength > RoomMinY)
+		float PercentageChanceOfSplit = (float)FloorLength / (float)FloorGridSizeY;
+		PercentageChanceOfSplit *= SplitChance; // not needed, just to increase the chances of being split
+		float DiceRoll = FMath::RandRange(0.f, 1.f);
+
+		if (DiceRoll > PercentageChanceOfSplit)
+		{
+			return false;
+		}
+		if (FloorLength >= RoomMinY * 2)
 		{
 			return true;
 		}
 	}else if (Orientation == ESplitOrientation::ESO_Vertical)
 	{
 		const int32 FloorWidth = CornerCoordinates.LowerRightX - CornerCoordinates.UpperLeftX;
-		if (FloorWidth > RoomMinX)
+		float PercentageChanceOfSplit = (float)FloorWidth / (float)FloorGridSizeX;
+		PercentageChanceOfSplit *= SplitChance; // not needed, just to increase the chances of being split
+		float DiceRoll = FMath::RandRange(0.f, 1.f);
+
+		if (DiceRoll > PercentageChanceOfSplit)
+		{
+			return false;
+		}
+		if (FloorWidth >= RoomMinX * 2)
 		{
 			return true;
 		}
@@ -147,4 +168,26 @@ void Floor::SplitVertical(TSharedPtr<FloorNode> InA, TSharedPtr<FloorNode> InB, 
 
 	InC->SetCornerCoordinates(CornerCoordinatesC);
 	FloorNodeStack.Push(InC);
+}
+
+void Floor::DrawFloorNodes(UWorld* World)
+{
+	for (int32 i = 0; i < PartitionedFloor.Num(); i++)
+	{
+		FCornerCoordinates Coordinates = PartitionedFloor[i]->GetCornerCoordinates();
+		DrawFloorNode(World, Coordinates);
+	}
+}
+
+void Floor::DrawFloorNode(UWorld* World, FCornerCoordinates Coordinates)
+{
+	const FVector UpperLeft(Coordinates.UpperLeftX * UnitLength, Coordinates.UpperLeftY * UnitLength, 2.0f);
+	const FVector UpperRight(Coordinates.LowerRightX * UnitLength, Coordinates.UpperLeftY * UnitLength, 2.0f);
+	const FVector LowerLeft(Coordinates.UpperLeftX * UnitLength, Coordinates.LowerRightY * UnitLength, 2.0f);
+	const FVector LowerRight(Coordinates.LowerRightX * UnitLength, Coordinates.LowerRightY * UnitLength, 2.0f);
+	
+	DrawDebugLine(World, UpperLeft, UpperRight, FColor::Blue, true, -1, 0, 7.0f);
+	DrawDebugLine(World, UpperLeft, LowerLeft, FColor::Blue, true, -1, 0, 7.0f);
+	DrawDebugLine(World, LowerLeft, LowerRight, FColor::Blue, true, -1, 0, 7.0f);
+	DrawDebugLine(World, UpperRight, LowerRight, FColor::Blue, true, -1, 0, 7.0f);
 }

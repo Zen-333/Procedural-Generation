@@ -40,7 +40,7 @@ private:
 
 	float Radius;
 	
-    void SpawnItem(UClass* ItemToSpawn);
+    void SpawnItem(UClass* ItemToSpawn, FVector SpawnLocation);
 
 	void CreateGrid();
 

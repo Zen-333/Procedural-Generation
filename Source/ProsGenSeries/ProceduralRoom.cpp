@@ -30,7 +30,27 @@ void AProceduralRoom::BeginPlay()
 
 	TSharedPtr<Floor> TheFloor(new Floor());
 	TheFloor->Partition();
+	TheFloor->DrawFloorNodes(GetWorld());
 
+	for (int i = 0; i < TheFloor->GetPartitionedFloor().Num(); i++)
+	{
+		float DiceRoll = FMath::RandRange(0, 1);
+		if (DiceRoll < 0.5f)
+		{
+			float UpperLeftX = TheFloor->GetPartitionedFloor()[i]->GetCornerCoordinates().UpperLeftX * 200;
+			float UpperLeftY = TheFloor->GetPartitionedFloor()[i]->GetCornerCoordinates().UpperLeftY * 200;
+
+			float LowerRightX = TheFloor->GetPartitionedFloor()[i]->GetCornerCoordinates().LowerRightX * 200;
+			float LowerRightY = TheFloor->GetPartitionedFloor()[i]->GetCornerCoordinates().LowerRightY * 200;
+			FVector UpperLeft(UpperLeftX + 50, UpperLeftY + 50, 1.0f);
+			FVector LowerRight(LowerRightX - 50, LowerRightY - 50, 1.0f);
+			
+			FVector RandomPoint = GetRandomPointInSquare(UpperLeft, LowerRight);
+			UE_LOG(LogTemp, Warning, TEXT("RandomPoint: X: %f Y: %f Z: %f"), RandomPoint.X, RandomPoint.Y, RandomPoint.Z);
+			SpawnItem(ChairClass, RandomPoint);
+		}
+	}
+	
 	UE_LOG(LogTemp, Warning, TEXT("Number of nodes in partitioned floor stack %d"),TheFloor->GetPartitionedFloor().Num());
 	
 	/* Unique ptr only allows one pointer to point to it at once shared ptr is the opposite allows multiple
@@ -57,17 +77,17 @@ void AProceduralRoom::Tick(float DeltaTime)
 
 }
 
-void AProceduralRoom::SpawnItem(UClass* ItemToSpawn)
+void AProceduralRoom::SpawnItem(UClass* ItemToSpawn, FVector SpawnLocation)
 {
-	const float XCordinate = FMath::FRandRange(-50.f, 50.f);
-	const float YCordinate = FMath::FRandRange(-50.f, 50.f);
+	//const float XCordinate = FMath::FRandRange(-50.f, 50.f);
+	//const float YCordinate = FMath::FRandRange(-50.f, 50.f);
 
 	const float Yaw = FMath::FRandRange(0.f, 360.f);
 
-	FVector Location(XCordinate, YCordinate, 0.f);
+	//FVector Location(XCordinate, YCordinate, 0.f);
 	FRotator Rotation(0.f, Yaw, 0.f);
 
-	GetWorld()->SpawnActor<AActor>(ItemToSpawn, Location, Rotation);
+	GetWorld()->SpawnActor<AActor>(ItemToSpawn, SpawnLocation, Rotation);
 }
 
 void AProceduralRoom::CreateGrid()

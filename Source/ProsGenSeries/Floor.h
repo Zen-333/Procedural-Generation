@@ -1,12 +1,11 @@
 #pragma once
+#include "FloorNode.h"
 
 enum class ESplitOrientation // this is a scoped enum so allows for more enum types with same name
 {
 	ESO_Horizontal,
 	ESO_Vertical
 };
-
-class FloorNode;
 
 class Floor
 {
@@ -22,6 +21,9 @@ public:
 	void SplitHorizontal(TSharedPtr<FloorNode> InA, TSharedPtr<FloorNode> InB, TSharedPtr<FloorNode> InC);
 	void SplitVertical(TSharedPtr<FloorNode> InA, TSharedPtr<FloorNode> InB, TSharedPtr<FloorNode> InC);
 
+	void DrawFloorNodes(class UWorld* World);
+	void DrawFloorNode(UWorld* World, FCornerCoordinates Coordinates);
+	
 	FORCEINLINE TArray<TSharedPtr<FloorNode>> GetPartitionedFloor() const {return PartitionedFloor;};
 private:
 	TArray<TSharedPtr<FloorNode>> FloorNodeStack;
@@ -31,5 +33,7 @@ private:
 	int32 FloorGridSizeY;
 	int32 RoomMinX;
 	int32 RoomMinY;
+	float UnitLength;
+	float SplitChance;
 	
 };
