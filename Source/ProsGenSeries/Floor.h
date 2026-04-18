@@ -1,6 +1,6 @@
 #pragma once
 
-enum class ESplitOrientation
+enum class ESplitOrientation // this is a scoped enum so allows for more enum types with same name
 {
 	ESO_Horizontal,
 	ESO_Vertical

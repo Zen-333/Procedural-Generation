@@ -31,6 +31,7 @@ void AProceduralRoom::BeginPlay()
 	TSharedPtr<Floor> TheFloor(new Floor());
 	TheFloor->Partition();
 
+	UE_LOG(LogTemp, Warning, TEXT("Number of nodes in partitioned floor stack %d"),TheFloor->GetPartitionedFloor().Num());
 	
 	/* Unique ptr only allows one pointer to point to it at once shared ptr is the opposite allows multiple
 	// unique ptr when the pointer goes out of scope (in this case once the begin play ends so the pointer life has ended) it destroyes the object
